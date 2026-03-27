@@ -1,14 +1,21 @@
-# VULNERABILIDAD INTENCIONADA 1: Usar una imagen base sin especificar un tag exacto o sha256
-FROM python:3.9
+# VULNERABILIDAD CORREGIDA: Se especifica tag exacto
+FROM python:3.9-slim
+
+# VULNERABILIDAD CORREGIDA (HIGH): Missing User Instruction
+RUN useradd -m appuser
 
 WORKDIR /app
 
-# VULNERABILIDAD INTENCIONADA 2: Copiar todo de golpe (podría incluir archivos sensibles)
-COPY . /app
+COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+# VULNERABILIDAD CORREGIDA (LOW): pip install sin caché
+RUN pip install --no-cache-dir -r requirements.txt
 
-# VULNERABILIDAD INTENCIONADA 3: No crear un usuario sin privilegios (se ejecuta como root)
+COPY . .
+
+RUN chown -R appuser /app
+
+USER appuser
+
 EXPOSE 5000
-
 CMD ["python", "app.py"]

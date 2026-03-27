@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tablón de Anuncios</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #f5f5f5; }
+        h1 { color: #333; text-align: center; }
+        .form-box { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; padding: 8px; margin: 6px 0 12px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #45a049; }
+        .anuncio { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .anuncio h3 { margin: 0 0 8px; color: #333; }
+        .anuncio p { margin: 0 0 8px; color: #666; }
+        .anuncio small { color: #999; }
+        .btn-eliminar { background: #e74c3c; padding: 6px 12px; font-size: 12px; }
+        .btn-eliminar:hover { background: #c0392b; }
+    </style>
+</head>
+<body>
+    <h1>📋 Tablón de Anuncios</h1>
+    <div class="form-box">
+        <h2>Nuevo Anuncio</h2>
+        <input type="text" id="titulo" placeholder="Título del anuncio">
+        <textarea id="descripcion" rows="3" placeholder="Descripción"></textarea>
+        <input type="text" id="autor" placeholder="Tu nombre">
+        <button onclick="crearAnuncio()">Publicar Anuncio</button>
+    </div>
+    <div id="anuncios">
+        {% for a in anuncios %}
+        <div class="anuncio" id="a-{{ a.id }}">
+            <h3>{{ a.titulo }}</h3>
+            <p>{{ a.descripcion }}</p>
+            <small>Publicado por: {{ a.autor }}</small><br>
+            <button class="btn-eliminar" onclick="eliminarAnuncio('{{ a.id }}')">Eliminar</button>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        function crearAnuncio() {
+            const titulo = document.getElementById('titulo').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const autor = document.getElementById('autor').value;
+            if (!titulo || !descripcion || !autor) { alert('Rellena todos los campos'); return; }
+            fetch('/anuncios', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({titulo, descripcion, autor})
+            }).then(r => r.json()).then(() => location.reload());
+        }
+        function eliminarAnuncio(id) {
+            fetch('/anuncios/' + id, {method: 'DELETE'}).then(() => {
+                document.getElementById('a-' + id).remove();
+            });
+        }
+    </script>
+</body>
+</html>
