@@ -7,20 +7,29 @@ services:
       - redis_data:/data
 
   web:
-    # VULNERABILIDAD INTENCIONADA 4: Sin límites de memoria ni CPU
-    # VULNERABILIDAD INTENCIONADA 5: Sin healthcheck
+    # VULNERABILIDAD CORREGIDA (MEDIUM): Se añaden límites de memoria y CPU
     build: ./app
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
       - redis
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    # VULNERABILIDAD CORREGIDA (MEDIUM): Se añade healthcheck
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   nginx:
-    # VULNERABILIDAD INTENCIONADA 6: Puerto no bindeado a interfaz específica
+    # VULNERABILIDAD CORREGIDA (MEDIUM): Puerto bindeado a interfaz específica
     build: ./nginx
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     depends_on:
       - web
 
