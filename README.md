@@ -63,3 +63,14 @@ El HPA escalará automáticamente entre 1 y 8 réplicas según el uso de CPU (um
 ├── imagesEnRegistry.sh
 └── createCluster.sh
 ```
+
+## Acceso a la aplicación
+
+Una vez arrancado, la aplicación es accesible en el **puerto 8080**.
+
+En GitHub Codespaces, ve a la pestaña **PUERTOS** y abre el puerto **8080** en el navegador.
+
+Si quieres hacer el port-forward manualmente:
+```bash
+kubectl port-forward service/nginx 8080:80
+```
